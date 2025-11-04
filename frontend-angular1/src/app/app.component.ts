@@ -12,7 +12,7 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   title = 'frontend-angular1';
-  apiBase = 'http://localhost:5000';
+  apiBase = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : '/api';
   me: { authenticated: boolean; role: 'user' | 'admin'; userName?: string; adminName?: string } | null = null;
   error: string | null = null;
 
