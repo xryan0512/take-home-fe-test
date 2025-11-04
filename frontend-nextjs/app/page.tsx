@@ -25,9 +25,9 @@ export default function LoginPage() {
         setError('OTP inválido');
         return;
       }
-
+      window.location.href = '/home';
     } catch (err) {
-      setError('Error de red');
+      setError('Network error');
     }
   }
 
