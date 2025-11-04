@@ -27,7 +27,7 @@ export default function HomePage() {
   }, []);
 
   async function logout() {
-    await fetch(`${API_BASE}/auth/logot`, { method: 'POST', credentials: 'include' });
+    await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
     window.location.href = '/';
   }
 
