@@ -1,18 +1,32 @@
-<div style="padding: 20px; font-family: Arial, Helvetica, sans-serif">
-  <h1>{{ title }}</h1>
-  <div *ngIf="me as s; else notAuth">
-    <p>
-      Bienvenido {{ s.role === 'admin' ? s.adminName : s.userName }}
-    </p>
-    <p *ngIf="s.role === 'admin'" style="font-weight: bold;">Panel abierto por: {{ s.adminName }}</p>
-    <div style="display: flex; gap: 12px; margin-top: 12px;">
-      <button (click)="goHome()">Volver al Home (Next.js)</button>
-      <button *ngIf="s.role === 'admin'" (click)="backToAdmin()">Volver a Admin</button>
+<div
+  style="background-color:#EDE9FE; color:#5B21B6; padding:12px 16px; display:flex; justify-content:space-between; align-items:center; font-family: Arial, Helvetica, sans-serif">
+  <span style="font-weight:600">Angular User</span>
+  <button *ngIf="me" (click)="goHome()"
+    style="background-color:#5B21B6; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer">Go
+    to Dashboard</button>
+</div>
+
+<div
+  style="min-height: calc(100vh - 56px); display: flex; align-items: center; justify-content: center; padding: 24px; font-family: Arial, Helvetica, sans-serif; background-color: #F9FAFB;">
+  <div
+    style="width: 100%; max-width: 520px; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1); padding: 24px; text-align: center;">
+    <div *ngIf="me as s; else notAuth">
+      <h2 style="margin: 0 0 8px; color:#111827;"> Welcome</h2>
+      <p style="margin: 0 0 12px; color:#111827;">{{ s.role === 'admin' ? s.adminName : s.userName }}</p>
+      <p *ngIf="s.role === 'admin'" style="margin: 0 0 16px; font-weight: 600; color:#4B5563;">Admin opened: {{
+        s.adminName }}</p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button *ngIf="s.role === 'admin'" (click)="backToAdmin()"
+          style="background-color:#5B21B6; color:white; border:none; padding:10px 16px; border-radius:8px; cursor:pointer">Back
+          to Admin</button>
+      </div>
     </div>
+    <ng-template #notAuth>
+      <p *ngIf="error" style="color: #DC2626; margin-bottom: 12px;">{{ error }}</p>
+      <button (click)="goHome()"
+        style="background-color:#0C4A6E; color:white; border:none; padding:10px 16px; border-radius:8px; cursor:pointer">Go
+        to Home</button>
+    </ng-template>
   </div>
-  <ng-template #notAuth>
-    <p *ngIf="error" style="color: red;">{{ error }}</p>
-    <button (click)="goHome()">Ir al Home</button>
-  </ng-template>
 </div>
 <router-outlet></router-outlet>
