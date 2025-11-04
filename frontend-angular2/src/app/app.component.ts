@@ -23,6 +23,18 @@ export class AppComponent {
 
   constructor(private http: HttpClient) { }
 
+  ngOnInit(): void {
+    this.http.get(`${this.apiBase}/session/me`, { withCredentials: true }).subscribe({
+      next: (me: any) => {
+        if (me?.role === 'admin') {
+          this.adminName = me.adminName ?? 'Administrador';
+          this.view = 'dashboard';
+        }
+      },
+      error: () => { this.view = 'login'; }
+    });
+  }
+
   async login(e: Event) {
     e.preventDefault();
     this.error = null;
