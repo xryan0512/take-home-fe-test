@@ -24,6 +24,13 @@ builder.Services.ConfigureHttpJsonOptions(opts =>
 
 var app = builder.Build();
 
+// Optional PathBase support for deployments under a sub-path (e.g. /api)
+var configuredPathBase = app.Configuration["PathBase"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_PATHBASE");
+if (!string.IsNullOrWhiteSpace(configuredPathBase))
+{
+    app.UsePathBase(configuredPathBase);
+}
+
 app.UseCors("AppCors");
 
 // In-memory session store
