@@ -9,19 +9,22 @@ type Me = { authenticated: boolean; role: 'user' | 'admin'; userName?: string; a
 export default function HomePage() {
   const [me, setMe] = useState<Me | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
         const res = await fetch(`${API_BASE}/session/me`, { credentials: 'include' });
         if (!res.ok) {
-          window.location.href = '/';
+          window.location.replace('/');
           return;
         }
         const data = await res.json();
         setMe(data);
       } catch {
         setError('Failed to get session');
+      } finally {
+        setLoading(false);
       }
     })();
   }, []);
@@ -29,6 +32,10 @@ export default function HomePage() {
   async function logout() {
     await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
     window.location.href = '/';
+  }
+
+  if (loading) {
+    return null; // Evita flash de contenido hasta saber si está autenticado
   }
 
   return (
