@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +14,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class AppComponent {
   title = 'Angular Admin';
-  apiBase = 'http://localhost:5000';
+  apiBase = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : '/api';
 
   email = '';
   password = '';
@@ -27,7 +28,7 @@ export class AppComponent {
     this.http.get(`${this.apiBase}/session/me`, { withCredentials: true }).subscribe({
       next: (me: any) => {
         if (me?.role === 'admin') {
-          this.adminName = me.adminName ?? 'Administrador';
+          this.adminName = me.adminName ?? 'Admin';
           this.view = 'dashboard';
         }
       },
@@ -39,14 +40,14 @@ export class AppComponent {
     e.preventDefault();
     this.error = null;
     try {
-      await this.http.post(
+      await firstValueFrom(this.http.post(
         `${this.apiBase}/auth/login-admin`,
         { email: this.email, password: this.password },
         { withCredentials: true }
-      ).toPromise();
+      ));
       // Fetch me
-      const me: any = await this.http.get(`${this.apiBase}/session/me`, { withCredentials: true }).toPromise();
-      this.adminName = me?.adminName ?? 'Administrador';
+      const me: any = await firstValueFrom(this.http.get(`${this.apiBase}/session/me`, { withCredentials: true }));
+      this.adminName = me?.adminName ?? 'Admin';
       this.view = 'dashboard';
     } catch {
       this.error = 'Credenciales inválidas';
@@ -57,8 +58,12 @@ export class AppComponent {
     window.location.href = 'http://localhost:4201';
   }
 
+  openNextApp() {
+    window.location.href = 'http://localhost:3000/home';
+  }
+
   async logout() {
-    await this.http.post(`${this.apiBase}/auth/logout`, {}, { withCredentials: true }).toPromise();
+    await firstValueFrom(this.http.post(`${this.apiBase}/auth/logout`, {}, { withCredentials: true }));
     this.view = 'login';
     this.email = '';
     this.password = '';
