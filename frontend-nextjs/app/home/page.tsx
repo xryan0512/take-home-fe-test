@@ -54,16 +54,25 @@ export default function HomePage() {
           padding: '8px 12px', borderRadius: 6, cursor: 'pointer'
         }}>Logout</button>
       </div>
-      <div style={{ maxWidth: 600, padding: 20 }}>
+      <div className="flex min-h-[calc(100vh-56px)] items-center justify-center bg-zinc-50 font-sans dark:bg-black" style={{
+        minHeight: 'calc(100vh - 56px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 20,
+        backgroundColor: '#F0F9FF'
+      }}>
         {me && (
           <div style={{
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #E5E7EB',
-            borderRadius: 12,
-            boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+            backgroundColor: 'rgba(255,255,255,0.75)',
+            border: '1px solid rgba(229,231,235,0.6)',
+            borderRadius: 16,
+            backdropFilter: 'blur(8px)',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
             padding: 24,
-            maxWidth: 480,
-            margin: '24px auto',
+            width: '100%',
+            maxWidth: 520,
+            margin: '0 auto',
             textAlign: 'center',
             color: '#000000'
           }}>
