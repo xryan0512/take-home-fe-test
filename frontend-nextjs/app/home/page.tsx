@@ -35,7 +35,7 @@ export default function HomePage() {
   }
 
   if (loading) {
-    return null; // Evita flash de contenido hasta saber si está autenticado
+    return null;
   }
 
   return (
