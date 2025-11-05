@@ -1,16 +1,22 @@
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .GetChildren()
+    .Select(c => c.Value)
+    .Where(v => !string.IsNullOrWhiteSpace(v))
+    .ToArray();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AppCors", policy =>
     {
-        policy.WithOrigins(
-                "http://localhost:3000",
-                "http://localhost:4201",
-                "http://localhost:4202")
+        policy.WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -23,6 +29,7 @@ builder.Services.ConfigureHttpJsonOptions(opts =>
 });
 
 var app = builder.Build();
+var env = app.Environment;
 
 // Optional PathBase support for deployments under a sub-path (e.g. /api)
 var configuredPathBase = app.Configuration["PathBase"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_PATHBASE");
@@ -31,7 +38,24 @@ if (!string.IsNullOrWhiteSpace(configuredPathBase))
     app.UsePathBase(configuredPathBase);
 }
 
-app.UseCors("AppCors");
+// Respect proxy headers from Cloudflare/Azure
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
+// Enforce HTTPS and HSTS in production
+app.UseHttpsRedirection();
+if (!env.IsDevelopment())
+{
+    app.UseHsts();
+}
+
+// CORS only needed for local development; in production we serve same-origin
+if (env.IsDevelopment())
+{
+    app.UseCors("AppCors");
+}
 
 // In-memory session store
 var sessions = new ConcurrentDictionary<string, Session>();
