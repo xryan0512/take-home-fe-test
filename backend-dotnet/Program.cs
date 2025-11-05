@@ -62,7 +62,18 @@ var sessions = new ConcurrentDictionary<string, Session>();
 
 app.MapPost("/auth/verify-otp", async (HttpContext ctx) =>
 {
-    var payload = await ctx.Request.ReadFromJsonAsync<UserOtpRequest>();
+    UserOtpRequest? payload = null;
+    if (ctx.Request.HasFormContentType)
+    {
+        var form = await ctx.Request.ReadFormAsync();
+        var phone = form["phone"].ToString();
+        var otp = form["otp"].ToString();
+        payload = new UserOtpRequest(phone, otp);
+    }
+    else
+    {
+        payload = await ctx.Request.ReadFromJsonAsync<UserOtpRequest>();
+    }
     if (payload is null || string.IsNullOrWhiteSpace(payload.Phone) || string.IsNullOrWhiteSpace(payload.Otp))
     {
         return Results.BadRequest(new { error = "Parámetros inválidos" });
@@ -79,12 +90,27 @@ app.MapPost("/auth/verify-otp", async (HttpContext ctx) =>
     sessions[sessionId] = session;
 
     SetSessionCookie(ctx, sessionId);
+    if (ctx.Request.HasFormContentType)
+    {
+        return Results.Redirect("/home");
+    }
     return Results.Ok(new { ok = true, role = session.Role, userName });
 });
 
 app.MapPost("/auth/login-admin", async (HttpContext ctx) =>
 {
-    var payload = await ctx.Request.ReadFromJsonAsync<AdminLoginRequest>();
+    AdminLoginRequest? payload = null;
+    if (ctx.Request.HasFormContentType)
+    {
+        var form = await ctx.Request.ReadFormAsync();
+        var email = form["email"].ToString();
+        var password = form["password"].ToString();
+        payload = new AdminLoginRequest(email, password);
+    }
+    else
+    {
+        payload = await ctx.Request.ReadFromJsonAsync<AdminLoginRequest>();
+    }
     if (payload is null || string.IsNullOrWhiteSpace(payload.Email) || string.IsNullOrWhiteSpace(payload.Password))
     {
         return Results.BadRequest(new { error = "Parámetros inválidos" });
