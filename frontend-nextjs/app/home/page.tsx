@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5000';
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? '/api';
 
 type Me = { authenticated: boolean; role: 'user' | 'admin'; userName?: string; adminName?: string };
 
@@ -78,7 +78,7 @@ export default function HomePage() {
           }}>
             <p style={{ marginBottom: 12, color: '#000000' }}>Autenticado como: {me.role === 'admin' ? me.adminName : me?.userName}</p>
             <button
-              onClick={() => (window.location.href = 'http://localhost:4201')}
+              onClick={() => (window.location.href = ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:4201' : '/user'))}
               style={{
                 backgroundColor: '#0C4A6E',
                 color: '#FFFFFF',
