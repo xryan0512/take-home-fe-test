@@ -30,11 +30,13 @@ export class AppComponent {
   }
 
   goHome() {
-    window.location.href = 'http://localhost:3000/home';
+    const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    window.location.href = isLocal ? 'http://localhost:3000/home' : '/home';
   }
 
   backToAdmin() {
-    window.location.href = 'http://localhost:4202';
+    const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    window.location.href = isLocal ? 'http://localhost:4202' : '/admin';
   }
 }
 
