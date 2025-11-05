@@ -66,3 +66,104 @@ Organize everything in a single repository and provide the repository link upon 
 ---
 
 Feel free to improve it as you wish, using Docker, Webpack, Tailwind, or any other tools and optimizations you consider useful.
+
+
+## Local Development & Testing (English)
+
+### Prerequisites
+- .NET SDK 8.0+
+- Node.js 18+ (or 20+) and npm
+- Angular CLI (optional; npm scripts already set)
+- Terminal (PowerShell, cmd, or bash)
+
+### Default Ports
+- Backend (.NET): http://localhost:5000
+- Next.js: http://localhost:3000
+- Angular User: http://localhost:4201
+- Angular Admin: http://localhost:4202
+
+### 1) Install dependencies
+```bash
+# From repo root
+cd backend-dotnet
+dotnet restore
+cd ..
+
+cd frontend-nextjs
+npm install
+cd ..
+
+cd frontend-angular1
+npm install
+cd ..
+
+cd frontend-angular2
+npm install
+cd ..
+```
+
+### 2) Start each app (use four terminals)
+```bash
+# Terminal 1 - Backend (.NET)
+cd backend-dotnet
+dotnet run
+# Exposes http://localhost:5000 (CORS is enabled for 3000, 4201, 4202 in Development)
+
+# Terminal 2 - Next.js
+cd frontend-nextjs
+npm run dev
+# Opens http://localhost:3000
+# In development, /api/* is rewritten to http://localhost:5000
+
+# Terminal 3 - Angular User
+cd frontend-angular1
+npm run start
+# Opens http://localhost:4201
+
+# Terminal 4 - Angular Admin
+cd frontend-angular2
+npm run start
+# Opens http://localhost:4202
+```
+
+### 3) Test flow A: Next.js → Angular User
+1. Visit `http://localhost:3000`.
+2. Enter any phone, click “Send OTP”.
+3. Enter OTP `123456`, click “Sign in”.
+4. You land on `/home`. Click “Go to App`.
+   - Expected: Browser opens `http://localhost:4201` (Angular User) already authenticated, showing “Welcome” and your user name.
+5. In Angular User, click “Go to Dashboard” to return to Next.js `/home`.
+   - Expected: You remain authenticated.
+
+### 4) Test flow B: Angular Admin → Angular User
+1. Visit `http://localhost:4202`.
+2. Login with:
+   - Email: `admin@example.com`
+   - Password: `password123`
+3. In the admin dashboard, click “Application #1 (Angular User)”.
+   - Expected: Browser opens `http://localhost:4201` and shows:
+     - Welcome message
+     - An “Admin opened” header with the Admin name
+4. Click “Back to Admin” to return to `http://localhost:4202`.
+   - Expected: You remain authenticated as admin.
+
+### 5) Cookie & CORS notes
+- The backend issues an HttpOnly cookie: `session_id` (SameSite=Lax; Secure in production).
+- Development CORS is configured in `backend-dotnet/appsettings.Development.json` under `Cors:AllowedOrigins` for:
+  - `http://localhost:3000`, `http://localhost:4201`, `http://localhost:4202`
+  - `http://127.0.0.1:4201`, `http://127.0.0.1:4202`
+- Angular requests use `{ withCredentials: true }`.
+- Next.js dev rewrites `/api/*` → backend (`frontend-nextjs/next.config.ts`). The login API route forwards `Set-Cookie` from backend to the browser.
+
+### 6) Optional environment variables
+- Next.js uses `NEXT_PUBLIC_API_BASE` for client calls (defaults to `/api` in dev due to rewrite) and `API_BASE` for server calls (defaults to `http://localhost:5000`). Only set these if you change backend URL/port.
+
+### 7) Troubleshooting
+- Angular shows “Not authenticated”:
+  - Ensure backend is running at `http://localhost:5000`.
+  - Confirm CORS AllowedOrigins include Angular ports (4201, 4202).
+  - Keep `{ withCredentials: true }` on Angular requests.
+- Next.js login does not persist:
+  - Ensure the dev server is on `http://localhost:3000` and `/api/*` reaches the backend.
+  - The API route in `frontend-nextjs/app/api/login/route.ts` must forward `Set-Cookie` (already implemented).
+- Clear cookies for `localhost` and retry if a flow gets stuck.

@@ -96,3 +96,4 @@ az afd endpoint show -g $ResourceGroup --profile-name $afdProfile -n $afdEndpoin
 
 
 
+
