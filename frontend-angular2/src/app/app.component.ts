@@ -55,11 +55,13 @@ export class AppComponent {
   }
 
   openUserApp() {
-    window.location.href = 'http://localhost:4201';
+    const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    window.location.href = isLocal ? 'http://localhost:4201' : '/user';
   }
 
   openNextApp() {
-    window.location.href = 'http://localhost:3000/home';
+    const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    window.location.href = isLocal ? 'http://localhost:3000/home' : '/home';
   }
 
   async logout() {
